@@ -1,9 +1,9 @@
 import React from 'react'
 
-const NotFoundFage = () => {
+const NotFoundPage = () => {
   return (
     <div>NotFoundFage</div>
   )
 }
 
-export default NotFoundFage
+export default NotFoundPage

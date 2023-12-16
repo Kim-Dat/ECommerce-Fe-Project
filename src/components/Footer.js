@@ -77,7 +77,7 @@ const Footer = () => {
                                 <Link to={"/term-conditions"} className="text-white py-3 mb-1">
                                     Terms & Conditions
                                 </Link>
-                                <Link to={"/blog"} className="text-white py-3 mb-1">
+                                <Link to={"/blogs"} className="text-white py-3 mb-1">
                                     Blogs
                                 </Link>
                             </div>

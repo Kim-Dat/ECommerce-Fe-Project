@@ -8,12 +8,12 @@ const BreadCrumb = (props) => {
         <Container class1={"breadcrumb mb-0 py-4"}>
             <div className="row">
                 <div className="col-12">
-                    <p className="text-center">
+                    <div className="text-center">
                         <Link to={"/"} className="text-dark">
                             Home &nbsp;
                         </Link>
-                        / {title}
-                    </p>
+                        / <span className="fs-3 fw-medium">{title}</span>
+                    </div>
                 </div>
             </div>
         </Container>

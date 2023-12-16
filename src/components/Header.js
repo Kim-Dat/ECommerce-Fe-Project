@@ -1,24 +1,67 @@
-import React from "react";
-import { NavLink, Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { BsSearch } from "react-icons/bs";
-import compare from "../images/compare.svg"
-import wishlist from "../images/wishlist.svg"
-import user from "../images/user.svg"
-import cart from "../images/cart.svg"
-import menu from "../images/menu.svg"
+import compare from "../images/compare.svg";
+import wishlist from "../images/wishlist.svg";
+import user from "../images/user.svg";
+import cart from "../images/cart.svg";
+import menu from "../images/menu.svg";
+import { useDispatch, useSelector } from "react-redux";
+import { Typeahead } from "react-bootstrap-typeahead";
+import "react-bootstrap-typeahead/css/Typeahead.css";
+
 const Header = () => {
+    const [totalAmount, setTotalAmount] = useState(null);
+    const [quantityProductCart, setQuantityProductCart] = useState(0);
+    const [paginate, setPaginate] = useState(true);
+    const userCartState = useSelector((state) => state?.user?.cartProducts);
+    const userState = useSelector((state) => state?.user);
+    const productState = useSelector((state) => state?.product?.products);
+    const [productOpt, setProductOpt] = useState([]);
+    const navigate = useNavigate();
+    
+    useEffect(() => {
+        let sum = 0;
+        const cartLength = userCartState?.length;
+        for (let index = 0; index < cartLength; index++) {
+            sum += Number(userCartState[index]?.price * userCartState[index]?.quantity);
+        }
+        setTotalAmount(sum);
+        setQuantityProductCart(cartLength);
+    }, [userCartState]);
+
+    useEffect(() => {
+        let data = [];
+        for (let index = 0; index < productState.length; index++) {
+            const element = productState[index];
+            data.push({ id: index, prod: element?._id, name: element?.title });
+        }
+        setProductOpt(data);
+    }, [productState]);
+    const formattedAmount = (price) => {
+        return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).format(price);
+    };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.reload();
+    };
+
     return (
         <>
             <header className="header-top-strip py-3">
                 <div className="container-xxl">
                     <div className="row">
                         <div className="col-6">
-                            <p className="text-white mb-0">Free Shipping Over $100 & Free returns </p>
+                            <p className="text-white fs-5">Free Shipping Over 149k & Free returns </p>
                         </div>
                         <div className="col-6">
-                            <p className="text-end text-white mb-0">
+                            <p className="text-end text-white fs-5">
                                 Hotline:
-                                <a className="text-white" href="tel: 0867604223">
+                                <a className="text-white ms-3" href="tel: 0867604223">
                                     0867604223
                                 </a>
                             </p>
@@ -31,17 +74,25 @@ const Header = () => {
                     <div className="row align-items-center">
                         <div className="col-2">
                             <h1>
-                                <Link className="text-white">Dev/at.</Link>
+                                <Link to={"/"} className="text-white">
+                                    Dev/at.
+                                </Link>
                             </h1>
                         </div>
                         <div className="col-5">
                             <div className="input-group">
-                                <input
-                                    type="text"
-                                    className="form-control py-3"
-                                    placeholder="Enter Search Product Here..."
-                                    aria-label="Enter Search Product Here..."
-                                    aria-describedby="basic-addon2"
+                                <Typeahead
+                                    id="pagination-example"
+                                    onPaginate={() => console.log("Results paginated")}
+                                    onChange={(selected) => {
+                                        navigate(`/product/${selected[0]?.prod}`);
+                                    }}
+                                    minLength={2}
+                                    options={productOpt}
+                                    paginate={paginate}
+                                    labelKey={"name"}
+                                    placeholder="Search of Products here..."
+                                    clearButton
                                 />
                                 <span className="input-group-text px-5" id="basic-addon2">
                                     <BsSearch className="fs-4" />
@@ -49,8 +100,8 @@ const Header = () => {
                             </div>
                         </div>
                         <div className="col-5">
-                            <div className="header-upper-links d-flex justify-content-around align-items-center">
-                                <div>
+                            <div className="header-upper-links d-flex justify-content-end align-items-center">
+                                {/* <div className={"ms-5"}>
                                     <Link
                                         to={"/compare-product"}
                                         className="d-flex align-items-center gap-2 text-white"
@@ -60,8 +111,8 @@ const Header = () => {
                                             Compare <br /> Product
                                         </p>
                                     </Link>
-                                </div>
-                                <div>
+                                </div> */}
+                                <div className={"ms-5"}>
                                     <Link to={"/wishlist"} className="d-flex align-items-center gap-2 text-white">
                                         <img src={wishlist} alt="wishlist" />
                                         <p className="mb-0">
@@ -69,20 +120,26 @@ const Header = () => {
                                         </p>
                                     </Link>
                                 </div>
-                                <div>
-                                    <Link to={"/login"} className="d-flex align-items-center gap-2 text-white">
+                                <div className={"ms-5"}>
+                                    <Link to={!!userState.user ? "/my-profile" : "/login"} className="d-flex align-items-center gap-2 text-white">
                                         <img src={user} alt="user" />
-                                        <p className="mb-0">
-                                            Login <br /> My Account
-                                        </p>
+                                        {!!userState.user ? (
+                                            <p className="mb-0">
+                                                Welcome <br /> {`${userState.user.firstName} ${userState.user.lastName}`}
+                                            </p>
+                                        ) : (
+                                            <p className="mb-0">
+                                                Login <br /> My Account
+                                            </p>
+                                        )}
                                     </Link>
                                 </div>
-                                <div>
+                                <div className={"ms-5"}>
                                     <Link to={"/cart"} className="d-flex align-items-center gap-2 text-white">
                                         <img src={cart} alt="cart" />
                                         <div className="d-flex flex-column gap-3">
-                                            <span className="badge bg-white text-dark">0</span>
-                                            <span className="mb-0">$5555</span>
+                                            <span className="badge bg-white text-dark fs-6">{quantityProductCart}</span>
+                                            <span className="mb-0">{formattedAmount(totalAmount)}</span>
                                         </div>
                                     </Link>
                                 </div>
@@ -98,13 +155,7 @@ const Header = () => {
                             <div className="menu-bottom d-flex align-items-center">
                                 <div>
                                     <div className="dropdown">
-                                        <button
-                                            className="btn btn-secondary dropdown-toggle bg-transparent border-0 d-flex gap-3 align-items-center"
-                                            type="button"
-                                            id="dropdownMenuButton1"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
+                                        <button className="btn btn-secondary dropdown-toggle bg-transparent border-0 d-flex gap-3 align-items-center" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                             <img src={menu} alt="menu" />
                                             <span>Shop categories</span>
                                         </button>
@@ -131,8 +182,16 @@ const Header = () => {
                                     <div className="d-flex align-items-center gap-5">
                                         <NavLink to={"/"}>Home</NavLink>
                                         <NavLink to={"/store"}>Store</NavLink>
+                                        {!!userState.user ? <NavLink to={"/my-orders"}>My Order</NavLink> : null}
+
                                         <NavLink to={"/blogs"}>Blogs</NavLink>
                                         <NavLink to={"/contact"}>Contact</NavLink>
+
+                                        {!!userState.user ? (
+                                            <button onClick={() => handleLogout()} className="border border-0 fs-4 text-white bg-transparent text-uppercase">
+                                                Log out
+                                            </button>
+                                        ) : null}
                                     </div>
                                 </div>
                             </div>

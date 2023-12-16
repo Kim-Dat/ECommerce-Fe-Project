@@ -1,14 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BreadCrumb from "../components/BreadCrumb";
-import ReactStars from "react-rating-stars-component";
 import ProductCard from "../components/ProductCard";
-import Color from "../components/Color";
 import Container from "../components/Container";
+import { useDispatch, useSelector } from "react-redux";
+import { getProducts } from "../features/product/productSlice";
+
 const Store = () => {
-    const [grid, setGrid] = useState(4);
+    const [grid, setGrid] = useState(3);
+    /* option sidebar */
+    const [brands, setBrands] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [tags, setTags] = useState([]);
+    /* filter State */
+    const [category, setCategory] = useState(null);
+    const [brand, setBrand] = useState(null);
+    const [tag, setTag] = useState(null);
+    const [minPrice, setMinPrice] = useState(null);
+    const [maxPrice, setMaxPrice] = useState(null);
+    const [sort, setSort] = useState(null);
+
+    const dispatch = useDispatch();
+    const products = useSelector((state) => state.product.products) || [];
     const gridSetter = (i) => {
         setGrid(i);
     };
+    useEffect(() => {
+        dispatch(getProducts({ sort, tag, brand, category, minPrice, maxPrice }));
+    }, [sort, tag, brand, category, minPrice, maxPrice]);
+
+    useEffect(() => {
+        let newBrands = [];
+        let newCategories = [];
+        let newTags = [];
+        for (let index = 0; index < products.length; index++) {
+            const element = products[index];
+            newBrands.push(element.brand);
+            newCategories.push(element.category);
+            newTags.push(element.tags);
+        }
+        setBrands(newBrands);
+        setCategories(newCategories);
+        setTags(newTags);
+    }, []);
+
     return (
         <>
             <BreadCrumb title={"Store"} />
@@ -16,124 +50,62 @@ const Store = () => {
                 <div className="row">
                     <div className="col-3">
                         <div className="filter-card mb-3">
-                            <h3 className="filter-title">Shop By Categories</h3>
-                            <div>
-                                <ul className="ps-0">
-                                    <li>Watch</li>
-                                    <li>Tv</li>
-                                    <li>Camera</li>
-                                    <li>Laptop</li>
+                            <h3 className="fw-semibold">Shop By Categories</h3>
+                            <div className="p-3">
+                                <ul className="fs-4 ps-3">
+                                    {categories &&
+                                        [...new Set(categories)].map((item, index) => {
+                                            return (
+                                                <li key={index} onClick={() => setCategory(item)}>
+                                                    {item}
+                                                </li>
+                                            );
+                                        })}
                                 </ul>
                             </div>
                         </div>
                         <div className="filter-card mb-3">
-                            <h3 className="filter-title">Filter By</h3>
-                            <div>
-                                <h5 className="sub-title">Availablity</h5>
-                                <div>
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="checkbox" value={""} id=""></input>
-                                        <label className="form-check-label" htmlFor={""}>
-                                            In Stock(1)
-                                        </label>
-                                    </div>
-                                    <div className="form-check">
-                                        <input className="form-check-input" type="checkbox" value={""} id=""></input>
-                                        <label className="form-check-label" htmlFor={""}>
-                                            Out of Stock(0)
-                                        </label>
-                                    </div>
-                                </div>
-                                <h5 className="sub-title">Price</h5>
-                                <div className="d-flex gap-3">
+                            <h3 className="fw-semibold">Filter By</h3>
+                            <div className="mt-4">
+                                <h4 className="p-3 fw-semibold">Price</h4>
+                                <div className="d-flex gap-3 ms-3 fs-5">
                                     <div className="form-floating">
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            id="floatingInput"
-                                            placeholder="From"
-                                        />
+                                        <input type="number" className="form-control" id="floatingInput" placeholder="From" onChange={(e) => setMinPrice(e.target.value)} />
                                         <label htmlFor="floatingInput">From</label>
                                     </div>
                                     <div className="form-floating">
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            id="floatingInput"
-                                            placeholder="To"
-                                        />
+                                        <input type="number" className="form-control" id="floatingInput" placeholder="To" onChange={(e) => setMaxPrice(e.target.value)} />
                                         <label htmlFor="floatingInput">To</label>
                                     </div>
                                 </div>
-                                <h5 className="sub-title">Color</h5>
-                                <div>
-                                    <Color />
-                                </div>
-                                <h5 className="sub-title">Size</h5>
-                                <div>
-                                    <div className="form-check">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            value={""}
-                                            id="color-1"
-                                        ></input>
-                                        <label className="form-check-label" htmlFor={"color-1"}>
-                                            S (2)
-                                        </label>
-                                    </div>
-                                    <div className="form-check">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            value={""}
-                                            id="color-2"
-                                        ></input>
-                                        <label className="form-check-label" htmlFor={"color-2"}>
-                                            M (2)
-                                        </label>
+                            </div>
+                            <div className="mt-4">
+                                <h4 className="px-3 fw-semibold">Product Tags</h4>
+                                <div  className="p-3">
+                                    <div className="d-flex flex-wrap align-items-center gap-3">
+                                        {tags &&
+                                            [...new Set(tags)].map((item, index) => {
+                                                return (
+                                                    <span key={index} onClick={() => setTag(item)} className="badge bg-light text-secondary rounded-3 py-2 px-3 fs-5">
+                                                        {item}
+                                                    </span>
+                                                );
+                                            })}
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="filter-card mb-3">
-                            <h3 className="filter-title">Product Tags</h3>
-                            <div>
-                                <div className="d-flex flex-wrap align-items-center gap-3">
-                                    <span className="badge bg-light text-secondary rounded-3 py-2 px-3 fs-6">
-                                        Headphone
-                                    </span>
-                                    <span className="badge bg-light text-secondary rounded-3 py-2 px-3 fs-6">
-                                        Laptop
-                                    </span>
-                                    <span className="badge bg-light text-secondary rounded-3 py-2 px-3 fs-6">
-                                        Mobile
-                                    </span>
-                                    <span className="badge bg-light text-secondary rounded-3 py-2 px-3 fs-6">Wire</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="filter-card mb-3">
-                            <h3 className="filter-title">Random Product</h3>
-                            <div>
-                                <div className="random-products d-flex mb-3">
-                                    <div className="w-50">
-                                        <img src="/images/watch.jpg" className="img-fluid" alt="watch" />
-                                    </div>
-                                    <div className="w-50">
-                                        <h5>Kids headphone bulk 10 pack multi color for students</h5>
-                                        <ReactStars count={5} size={24} value={3} activeColor="#ffd700" edit={false} />
-                                        <b>$5555</b>
-                                    </div>
-                                </div>
-                                <div className="random-products d-flex">
-                                    <div className="w-50">
-                                        <img src="/images/watch.jpg" className="img-fluid" alt="watch" />
-                                    </div>
-                                    <div className="w-50">
-                                        <h5>Kids headphone bulk 10 pack multi color for students</h5>
-                                        <ReactStars count={5} size={24} value={3} activeColor="#ffd700" edit={false} />
-                                        <b>$5555</b>
+                            <div className="mt-4">
+                                <h3 className="p-3 fw-semibold">Product Brands</h3>
+                                <div className="p-3">
+                                    <div className="d-flex flex-wrap align-items-center gap-3">
+                                        {brands &&
+                                            [...new Set(brands)].map((item, index) => {
+                                                return (
+                                                    <span key={index} onClick={() => setBrand(item)} className="badge bg-light text-secondary rounded-3 py-2 px-3 fs-5">
+                                                        {item}
+                                                    </span>
+                                                );
+                                            })}
                                     </div>
                                 </div>
                             </div>
@@ -142,28 +114,33 @@ const Store = () => {
                     <div className="col-9">
                         <div className="filter-sort-grid mb-4">
                             <div className="d-flex justify-content-between align-items-center">
-                                <div className="d-flex align-items-center gap-5">
+                                <div className="d-flex align-items-center gap-5 fs-4">
                                     <p className="d-block" style={{ width: "100px" }}>
                                         Sort By:
                                     </p>
-                                    <select
-                                        name=""
-                                        className="form-control form-select"
-                                        defaultValue={"best-selling"}
-                                        id=""
-                                    >
-                                        <option value={"manual"}>Featured</option>
-                                        <option value={"best-selling"}>Best selling</option>
-                                        <option value={"title-ascending"}>Alphabetical, A-Z</option>
-                                        <option value={"title-descending"}>Alphabetical, Z-A</option>
-                                        <option value={"price-ascending"}>Price , low to high</option>
-                                        <option value={"price-descending"}>Price , high to low</option>
-                                        <option value={"created-ascending"}>Date, old to new</option>
-                                        <option value={"created-descending"}>Date, new to old</option>
+                                    <select name="" className="form-control form-select fs-4" defaultValue={"best-selling"} id="" onChange={(e) => setSort(e.target.value)}>
+                                        <option className="fs-4" value={"title"}>
+                                            Alphabetical, A-Z
+                                        </option>
+                                        <option className="fs-4" value={"-title"}>
+                                            Alphabetical, Z-A
+                                        </option>
+                                        <option className="fs-4" value={"price"}>
+                                            Price , low to high
+                                        </option>
+                                        <option className="fs-4" value={"-price"}>
+                                            Price , high to low
+                                        </option>
+                                        <option className="fs-4" value={"created"}>
+                                            Date, old to new
+                                        </option>
+                                        <option className="fs-4" value={"-created"}>
+                                            Date, new to old
+                                        </option>
                                     </select>
                                 </div>
-                                <div className="d-flex align-items-center gap-4">
-                                    <p className="totalProducts">21 Products</p>
+                                <div className="d-flex align-items-center gap-4 fs-4">
+                                    <p className="totalProducts">{products?.length} Products</p>
                                     <div className="grid">
                                         <div className="grid-item" onClick={() => gridSetter(3)}>
                                             <img src="/images/gr4.svg" className="d-block img-fluid" alt="grid" />
@@ -183,18 +160,7 @@ const Store = () => {
                         </div>
                         <div className="products-list pb-5">
                             <div className="row g-3">
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
-                                <ProductCard grid={grid} />
+                                <ProductCard data={products} grid={grid} />
                             </div>
                         </div>
                     </div>

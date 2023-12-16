@@ -1,40 +1,38 @@
 import React from "react";
 import ReactStars from "react-rating-stars-component";
 import { Link } from "react-router-dom";
-const SpecialProduct = () => {
+const SpecialProduct = (props) => {
+    const { title, brand, totalRating, price, quantity, sold, img } = props;
+    const formattedAmount = (price) => {
+        return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).format(price);
+    };
+    const percentage = (sold / quantity) * 100;
     return (
         <div className="col-4">
             <div className="spacial-product-card">
-                <div className="d-flex justify-content-between">
-                    <div>
-                        <img src="/images/watch.jpg" className="img-fluid" alt="watch" />
+                <div className="row">
+                    <div className="col-6">
+                        <img src={img} className="img-fluid" alt="watch" />
                     </div>
-                    <div className="special-product-content">
-                        <h5 className="brand">Havels</h5>
-                        <h6 className="title">Samsung Galaxy Note-10+ Mobile phone; Sim</h6>
-                        <ReactStars count={5} size={24} value={3} activeColor="#ffd700" edit={false} />
+                    <div className="special-product-content col-6">
+                        <h5 className="brand">{brand}</h5>
+                        <h6 className="title">{title}</h6>
+                        <ReactStars count={5} size={24} value={+totalRating} activeColor="#ffd700" edit={false} />
                         <p className="price">
-                            <span className="red-p">$100</span>
-                            &nbsp;
-                            <strike>$6666</strike>
+                            <span className="red-p">{formattedAmount(price)}</span>
                         </p>
-                        <div className="discount-till d-flex align-items-center">
-                            <p>
-                                <b>5</b>days
-                            </p>
-                            <div className="d-flex align-items-center gap-3">
-                                <span className="badge bg-danger rounded-circle p-3">1</span>:
-                                <span className="badge bg-danger rounded-circle p-3">1</span>:
-                                <span className="badge bg-danger rounded-circle p-3">1</span>
-                            </div>
-                        </div>
                         <div className="product-count my-3">
-                            <p>product : 5</p>
+                            <p>product : {quantity}</p>
                             <div className="progress">
                                 <div
                                     className="progress-bar"
                                     role="progressbar"
-                                    style={{ width: "25%" }}
+                                    style={{
+                                        width: `${percentage.toFixed(2)}%`,
+                                    }}
                                     aria-valuenow="25"
                                     aria-valuemin="0"
                                     aria-valuemax="100"

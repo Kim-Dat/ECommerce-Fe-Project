@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import BreadCrumb from "../components/BreadCrumb";
 import BlogCard from "../components/BlogCard";
 import Container from "../components/Container";
+import moment from "moment";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getBlogs } from "../features/blog/blogSlice";
 
 const Blogs = () => {
+    const dispatch = useDispatch();
+    const blogs = useSelector((state) => state.blog.blogs);
+    useEffect(() => {
+        dispatch(getBlogs());
+    }, []);
     return (
         <>
             <BreadCrumb title={"Blogs"} />
@@ -11,31 +20,45 @@ const Blogs = () => {
                 <div className="row">
                     <div className="col-3">
                         <div className="filter-card mb-3">
-                            <h3 className="filter-title">Shop By Categories</h3>
-                            <div>
-                                <ul className="ps-0">
-                                    <li>Watch</li>
-                                    <li>Tv</li>
-                                    <li>Camera</li>
-                                    <li>Laptop</li>
+                            <h3 className=" fw-semibold">Blog Categories</h3>
+                            <div className="p-3">
+                                <ul className="fs-4">
+                                    <li>
+                                        <Link to={"/"} className="text-secondary-emphasis">
+                                            Home
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        {" "}
+                                        <Link to={"/store"} className="text-secondary-emphasis">
+                                            Store
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        {" "}
+                                        <Link to={"/blogs"} className="text-secondary-emphasis">
+                                            Blogs
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link to={"/contact"} className="text-secondary-emphasis">
+                                            Contact
+                                        </Link>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                     <div className="col-9">
-                        <div className="row">
-                            <div className="col-6 mb-4">
-                                <BlogCard />
-                            </div>
-                            <div className="col-6 mb-4">
-                                <BlogCard />
-                            </div>
-                            <div className="col-6 mb-4">
-                                <BlogCard />
-                            </div>
-                            <div className="col-6 mb-4">
-                                <BlogCard />
-                            </div>
+                        <div className="row g-4">
+                            {blogs &&
+                                blogs?.map((item, index) => {
+                                    return (
+                                        <div key={index} className="col-6">
+                                            <BlogCard id={item?._id} description={item?.description} image={item?.images[0]?.url} title={item?.title} date={moment(item.create_at).format("MMMM Do YYYY, h:mm:ss a")} />
+                                        </div>
+                                    );
+                                })}
                         </div>
                     </div>
                 </div>

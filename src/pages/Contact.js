@@ -6,7 +6,40 @@ import { FaInfoCircle } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
+import { useFormik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { createContact } from "../features/contact/contactSlice";
+let yup = require("yup");
 const Contact = () => {
+    const dispatch = useDispatch();
+    let schema = yup.object().shape({
+        name: yup.string().required("Name is Required"),
+        email: yup
+            .string()
+            .email("Invalid email address")
+            .required("Email is Required"),
+        mobile: yup.number().required("Mobile is Required"),
+        comment: yup.string().required("Comment is Required"),
+    });
+    const formik = useFormik({
+        initialValues: {
+            name: "",
+            email: "",
+            mobile: "",
+            comment: "",
+        },
+        validationSchema: schema,
+        onSubmit: (values) => {
+            dispatch(
+                createContact({
+                    name: values.name,
+                    email: values.email,
+                    mobile: values.mobile,
+                    comment: values.comment,
+                })
+            );
+        },
+    });
     return (
         <>
             <BreadCrumb title={"Contact"} />
@@ -28,22 +61,89 @@ const Contact = () => {
                         <div className="contact-inner-wrapper d-flex justify-content-between">
                             <div className="contact-title">
                                 <h3>Contact</h3>
-                                <form className="d-flex flex-column gap-4" action="">
-                                    <CustomInput type="text" className="form-control" placeholder="Name" />
-                                    <CustomInput type="email" className="form-control" placeholder="E-mail"/>
-                                    <CustomInput type="tel" className="form-control" placeholder="Mobile number"/>
-                                    <div>
+                                <form
+                                    className="d-flex flex-column"
+                                    action=""
+                                    onSubmit={formik.handleSubmit}
+                                >
+                                    <div className="mt-3">
+                                        <CustomInput
+                                            type="text"
+                                            placeholder="Name"
+                                            name={"name"}
+                                            onCh={formik.handleChange("name")}
+                                            onBl={formik.handleBlur("name")}
+                                            val={formik.values.name}
+                                        />
+                                        {formik.touched.name &&
+                                        formik.errors.name ? (
+                                            <div className="error">
+                                                {formik.errors.name}
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                    <div className="mt-4">
+                                        <CustomInput
+                                            type="text"
+                                            placeholder="Email"
+                                            name={"email"}
+                                            onCh={formik.handleChange("email")}
+                                            onBl={formik.handleBlur("email")}
+                                            val={formik.values.email}
+                                        />
+                                        {formik.touched.email &&
+                                        formik.errors.email ? (
+                                            <div className="error">
+                                                {formik.errors.email}
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                    <div className="mt-4">
+                                        <CustomInput
+                                            type="tel"
+                                            placeholder="Mobile"
+                                            name={"mobile"}
+                                            onCh={formik.handleChange("mobile")}
+                                            onBl={formik.handleBlur("mobile")}
+                                            val={formik.values.mobile}
+                                        />
+                                        {formik.touched.mobile &&
+                                        formik.errors.mobile ? (
+                                            <div className="error">
+                                                {formik.errors.mobile}
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                    <div className="my-4">
                                         <textarea
-                                            name=""
-                                            id=""
+                                            type="text"
+                                            name="comment"
                                             className="w-100 form-control"
                                             rows={4}
                                             cols={30}
                                             placeholder="Comments"
+                                            onChange={formik.handleChange(
+                                                "comment"
+                                            )}
+                                            onBlur={formik.handleBlur(
+                                                "comment"
+                                            )}
+                                            value={formik.values.comment}
                                         ></textarea>
+                                        {formik.touched.comment &&
+                                        formik.errors.comment ? (
+                                            <div className="error">
+                                                {formik.errors.comment}
+                                            </div>
+                                        ) : null}
                                     </div>
                                     <div>
-                                        <button className="button-small border-0">Send</button>
+                                        <button
+                                            type="submit"
+                                            className="button-small border-0"
+                                        >
+                                            Send
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -53,7 +153,10 @@ const Contact = () => {
                                     <ul className="fs-4">
                                         <li className="d-flex align-items-center mb-3 gap-5">
                                             <AiFillHome className="info-icon" />
-                                            <address>52/255 Nguyễn Khang, Yên Hòa, Cầu Giấy, Hà Nội</address>
+                                            <address>
+                                                52/255 Nguyễn Khang, Yên Hòa,
+                                                Cầu Giấy, Hà Nội
+                                            </address>
                                         </li>
                                         <li className="d-flex align-items-center mb-3 gap-5">
                                             <BiSolidPhoneCall className="info-icon" />
@@ -67,7 +170,9 @@ const Contact = () => {
                                         </li>
                                         <li className="d-flex align-items-center mb-3 gap-5">
                                             <FaInfoCircle className="info-icon" />
-                                            <p>Monday - Friday - 10 AM - 8 PM</p>
+                                            <p>
+                                                Monday - Friday - 10 AM - 8 PM
+                                            </p>
                                         </li>
                                     </ul>
                                 </div>

@@ -21,7 +21,11 @@ import RefundPolicy from "./pages/RefundPolicy";
 import SingleProduct from "./pages/SingleProduct";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
-import NotFoundFage from "./pages/NotFoundFage";
+import NotFoundPage from "./pages/NotFoundPage";
+import PrivateRoutes  from "./routing/PrivateRouter";
+import PublicRoutes from "./routing/PublicRouter";
+import Orders from "./pages/Orders";
+import Profile from "./pages/Profile";
 function App() {
     return (
         <>
@@ -35,20 +39,22 @@ function App() {
                         <Route path="product/:id" element={<SingleProduct />} />
                         <Route path="blogs" element={<Blogs />} />
                         <Route path="blog/:id" element={<SingleBlog />} />
-                        <Route path="cart" element={<Cart />} />
-                        <Route path="checkout" element={<Checkout />} />
-                        <Route path="compare-product" element={<CompareProduct />} />
-                        <Route path="wishlist" element={<WishList />} />
-                        <Route path="login" element={<Login />} />
+                        <Route path="cart" element={<PrivateRoutes><Cart /></PrivateRoutes>}/>
+                        <Route path="my-orders" element={<PrivateRoutes><Orders/></PrivateRoutes>}/>
+                        <Route path="my-profile" element={<PrivateRoutes><Profile/></PrivateRoutes>}/>
+                        <Route path="checkout" element={<PrivateRoutes><Checkout /></PrivateRoutes>}/>
+                        <Route path="compare-product" element={<CompareProduct />}/>
+                        <Route path="wishlist" element={<PrivateRoutes><WishList /></PrivateRoutes>}/>
+                        <Route path="login" element={<PublicRoutes><Login /></PublicRoutes>}/>
                         <Route path="signup" element={<Signup />} />
-                        <Route path="forgot-password" element={<ForgotPassword />} />
-                        <Route path="reset-password" element={<ResetPassword />} />
-                        <Route path="privacy-policy" element={<PrivacyPolicy />} />
-                        <Route path="shipping-policy" element={<ShippingPolicy />} />
-                        <Route path="term-conditions" element={<TermAndConditions />} />
-                        <Route path="refund-policy" element={<RefundPolicy />} />
+                        <Route path="forgot-password" element={<ForgotPassword />}/>
+                        <Route path="reset-password/:token" element={<ResetPassword />}/>
+                        <Route path="privacy-policy" element={<PrivacyPolicy />}/>
+                        <Route path="shipping-policy" element={<ShippingPolicy />}/>
+                        <Route path="term-conditions" element={<TermAndConditions />}/>
+                        <Route path="refund-policy" element={<RefundPolicy />}/>
                     </Route>
-                    <Route path="*" element={<NotFoundFage />} />
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </Router>
         </>
